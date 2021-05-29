@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:http/http.dart' as http;
+import 'dart:convert';
 import 'package:flutter_course_clima/services/location.dart';
 
 const API_KEY = 'b6907d289e10d714a6e88b30761fae22';
@@ -34,7 +35,14 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     http.Response response = await http.get(url);
     if (response.statusCode == 200) {
-      print(response.body);
+      var data = jsonDecode(response.body);
+
+      print(data['coord']);
+      print(data['weather'][0]);
+
+      print(data['weather'][0]['id']);
+      print(data['name']);
+      print(data['main']['temp']);
     } else {
       print('Request failed with status: ${response.statusCode}');
     }
