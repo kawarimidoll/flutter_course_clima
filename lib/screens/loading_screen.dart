@@ -1,8 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_dotenv/flutter_dotenv.dart';
-import 'package:http/http.dart' as http;
-import 'dart:convert';
 import 'package:flutter_course_clima/services/location.dart';
+import 'package:flutter_course_clima/services/networking.dart';
 
 class LoadingScreen extends StatefulWidget {
   @override
@@ -16,10 +15,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
   void initState() {
     super.initState();
     print('initState!');
-    getLocation();
+    getLocationData();
   }
 
-  void getLocation() async {
+  void getLocationData() async {
     Location location = Location();
     await location.getCurrentLocation();
 
@@ -28,10 +27,6 @@ class _LoadingScreenState extends State<LoadingScreen> {
 
     print('Latitude: $latitude, Longitude: $longitude');
 
-    getData();
-  }
-
-  void getData() async {
     await dotenv.load();
     String apiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
 
@@ -45,18 +40,16 @@ class _LoadingScreenState extends State<LoadingScreen> {
       },
     );
 
-    http.Response response = await http.get(url);
-    if (response.statusCode == 200) {
-      var data = jsonDecode(response.body);
+    NetworkHelper networkHelper = NetworkHelper(url);
 
+    var data = await networkHelper.getData();
+
+    if (data != null) {
       print(data['coord']);
       print(data['weather'][0]);
-
       print(data['weather'][0]['id']);
       print(data['name']);
       print(data['main']['temp']);
-    } else {
-      print('Request failed with status: ${response.statusCode}');
     }
   }
 
