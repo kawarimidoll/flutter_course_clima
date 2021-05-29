@@ -16,6 +16,7 @@ class _LocationScreenState extends State<LocationScreen> {
   late int temperature;
   late String weatherIcon;
   late String cityName;
+  late String weatherMessage;
 
   @override
   void initState() {
@@ -27,14 +28,20 @@ class _LocationScreenState extends State<LocationScreen> {
 
   void updateUI(dynamic weatherData) {
     setState(() {
-      if (weatherData != null) {
-        print(weatherData['coord']);
-        var condition = weatherData['weather'][0]['id'];
-        weatherIcon = weather.getWeatherIcon(condition);
-        cityName = weatherData['name'];
-        double temp = weatherData['main']['temp'];
-        temperature = temp.toInt();
+      if (weatherData == null) {
+        weatherIcon = 'error';
+        cityName = '';
+        temperature = 0;
+        weatherMessage = 'Unable to get weather data';
+        return;
       }
+      // print(weatherData['coord']);
+      var condition = weatherData['weather'][0]['id'];
+      weatherIcon = weather.getWeatherIcon(condition);
+      cityName = weatherData['name'];
+      double temp = weatherData['main']['temp'];
+      temperature = temp.toInt();
+      weatherMessage = weather.getMessage(temperature);
     });
   }
 
@@ -60,7 +67,10 @@ class _LocationScreenState extends State<LocationScreen> {
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: <Widget>[
                   TextButton(
-                    onPressed: () {},
+                    onPressed: () async {
+                      var weatherData = await weather.getLocationWeather();
+                      updateUI(weatherData);
+                    },
                     child: Icon(
                       Icons.near_me,
                       size: 50.0,
@@ -93,7 +103,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "${weather.getMessage(temperature)} in $cityName!",
+                  "$weatherMessage in $cityName!",
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
