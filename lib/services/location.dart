@@ -14,7 +14,8 @@ class Location {
       print('ERROR!');
       print(e);
     }
-
-    print('Latitude: $_latitude, Longitude: $_longitude');
   }
+
+  double getLatitude() => _latitude ?? 0;
+  double getLongitude() => _longitude ?? 0;
 }
