@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:flutter_course_clima/utilities/constants.dart';
+import 'package:flutter_course_clima/services/weather.dart';
 
 class LocationScreen extends StatefulWidget {
   final locationWeather;
@@ -10,8 +11,10 @@ class LocationScreen extends StatefulWidget {
 }
 
 class _LocationScreenState extends State<LocationScreen> {
+  WeatherModel weather = WeatherModel();
+
   late int temperature;
-  late int condition;
+  late String weatherIcon;
   late String cityName;
 
   @override
@@ -23,13 +26,16 @@ class _LocationScreenState extends State<LocationScreen> {
   }
 
   void updateUI(dynamic weatherData) {
-    if (weatherData != null) {
-      print(weatherData['coord']);
-      condition = weatherData['weather'][0]['id'];
-      cityName = weatherData['name'];
-      double temp = weatherData['main']['temp'];
-      temperature = temp.toInt();
-    }
+    setState(() {
+      if (weatherData != null) {
+        print(weatherData['coord']);
+        var condition = weatherData['weather'][0]['id'];
+        weatherIcon = weather.getWeatherIcon(condition);
+        cityName = weatherData['name'];
+        double temp = weatherData['main']['temp'];
+        temperature = temp.toInt();
+      }
+    });
   }
 
   @override
@@ -78,7 +84,7 @@ class _LocationScreenState extends State<LocationScreen> {
                       style: kTempTextStyle,
                     ),
                     Text(
-                      '☀️',
+                      weatherIcon,
                       style: kConditionTextStyle,
                     ),
                   ],
@@ -87,7 +93,7 @@ class _LocationScreenState extends State<LocationScreen> {
               Padding(
                 padding: EdgeInsets.only(right: 15.0),
                 child: Text(
-                  "It's 🍦 time in San Francisco!",
+                  "${weather.getMessage(temperature)} in $cityName!",
                   textAlign: TextAlign.right,
                   style: kMessageTextStyle,
                 ),
