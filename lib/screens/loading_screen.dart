@@ -11,23 +11,15 @@ class LoadingScreen extends StatefulWidget {
 }
 
 class _LoadingScreenState extends State<LoadingScreen> {
-  late double latitude, longitude;
-
   @override
   void initState() {
     super.initState();
-    print('initState!');
     getLocationData();
   }
 
   void getLocationData() async {
     Location location = Location();
     await location.getCurrentLocation();
-
-    latitude = location.getLatitude();
-    longitude = location.getLongitude();
-
-    print('Latitude: $latitude, Longitude: $longitude');
 
     await dotenv.load();
     String apiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
@@ -36,9 +28,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
       'api.openweathermap.org',
       '/data/2.5/weather',
       {
-        'lat': latitude.toString(),
-        'lon': longitude.toString(),
+        'lat': location.getLatitude().toString(),
+        'lon': location.getLongitude().toString(),
         'appid': apiKey,
+        'units': 'metric',
       },
     );
 
@@ -50,18 +43,10 @@ class _LoadingScreenState extends State<LoadingScreen> {
       context,
       MaterialPageRoute(
         builder: (context) {
-          return LocationScreen();
+          return LocationScreen(locationWeather: data);
         },
       ),
     );
-
-    if (data != null) {
-      print(data['coord']);
-      print(data['weather'][0]);
-      print(data['weather'][0]['id']);
-      print(data['name']);
-      print(data['main']['temp']);
-    }
   }
 
   @override
