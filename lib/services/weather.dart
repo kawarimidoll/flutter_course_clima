@@ -3,12 +3,33 @@ import 'package:flutter_course_clima/services/location.dart';
 import 'package:flutter_course_clima/services/networking.dart';
 
 class WeatherModel {
+  Future<String> loadApiKey() async {
+    await dotenv.load();
+    return dotenv.env['OPENWEATHER_API_KEY'] ?? '';
+  }
+
+  Future<dynamic> getCityWeather(String cityName) async {
+    String apiKey = await loadApiKey();
+
+    Uri url = Uri.https(
+      'api.openweathermap.org',
+      '/data/2.5/weather',
+      {
+        'q': cityName,
+        'appid': apiKey,
+        'units': 'metric',
+      },
+    );
+
+    NetworkHelper networkHelper = NetworkHelper(url);
+    return await networkHelper.getData();
+  }
+
   Future<dynamic> getLocationWeather() async {
     Location location = Location();
     await location.getCurrentLocation();
 
-    await dotenv.load();
-    String apiKey = dotenv.env['OPENWEATHER_API_KEY'] ?? '';
+    String apiKey = await loadApiKey();
 
     Uri url = Uri.https(
       'api.openweathermap.org',

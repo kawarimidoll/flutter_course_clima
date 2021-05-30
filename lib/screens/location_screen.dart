@@ -22,12 +22,13 @@ class _LocationScreenState extends State<LocationScreen> {
   @override
   void initState() {
     super.initState();
-    print(widget);
+    // print(widget);
 
     updateUI(widget.locationWeather);
   }
 
   void updateUI(dynamic weatherData) {
+    // print('updateUI!');
     setState(() {
       if (weatherData == null) {
         weatherIcon = 'error';
@@ -43,6 +44,10 @@ class _LocationScreenState extends State<LocationScreen> {
       double temp = weatherData['main']['temp'];
       temperature = temp.toInt();
       weatherMessage = weather.getMessage(temperature);
+      // print(weatherIcon);
+      // print(cityName);
+      // print(temperature);
+      // print(weatherMessage);
     });
   }
 
@@ -78,8 +83,8 @@ class _LocationScreenState extends State<LocationScreen> {
                     ),
                   ),
                   TextButton(
-                    onPressed: () {
-                      Navigator.push(
+                    onPressed: () async {
+                      var typedName = await Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) {
@@ -87,6 +92,11 @@ class _LocationScreenState extends State<LocationScreen> {
                           },
                         ),
                       );
+                      if (typedName != null) {
+                        var weatherData =
+                            await weather.getCityWeather(typedName);
+                        updateUI(weatherData);
+                      }
                     },
                     child: Icon(
                       Icons.location_city,
